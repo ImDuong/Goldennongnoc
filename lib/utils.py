@@ -1,7 +1,11 @@
+import os
+
 import cv2
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+from typing import List
+from models.media import CamData
 
 
 def vertices_detector(mask, show_vertices=False, show_all=False):
@@ -58,6 +62,21 @@ def vertices_detector(mask, show_vertices=False, show_all=False):
             cv2.waitKey(0)
             cv2.destroyWindow("Check Points")
     return res
+
+
+def load_cameras(cam_srcs: List, base_path: str) -> List[CamData]:
+    cameras_data: List[CamData] = []
+    for cam_src in cam_srcs:
+        cv_cap = cv2.VideoCapture(os.path.join(base_path, cam_src["src"]))
+        if not cv_cap.isOpened():
+            print(f'Error opening video file: {cam_src["name"]} - {cam_src["src"]}')
+            exit()
+        cameras_data.append(CamData(
+            cam_name=cam_src["name"],
+            cam_src=cam_src["src"],
+            cam_cap=cv_cap,
+        ))
+    return cameras_data
 
 
 # for testing
