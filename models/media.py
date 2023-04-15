@@ -29,7 +29,7 @@ class SceneData:
 
 
 class CamData:
-    def __init__(self, cam_name: str, cam_src: str, cam_cap: cv2.VideoCapture):
+    def __init__(self, cam_name: str, cam_src: str="", cam_cap: cv2.VideoCapture=None):
         self.cam_name = cam_name
         self.cam_src = cam_src
         self.cam_cap = cam_cap
@@ -45,6 +45,11 @@ class CamData:
             with open(cam_path, 'w'):
                 pass
         return cam_path
+
+    def get_scene_by_name(self, scene_name: str) -> SceneData:
+        for scene in self.scenes:
+            if scene.scene_name == scene_name:
+                return scene
 
     def construct_cam_data_by_scene(self, scene_data: SceneData) -> str:
         result = ""
