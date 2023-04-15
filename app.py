@@ -57,6 +57,8 @@ class App:
         self.delay = 15
 
         self.is_media_running = False
+        self.load_media()
+
         self.window.mainloop()
 
     def add_input_field(self):
@@ -73,15 +75,19 @@ class App:
 
     def load_media(self):
         self.cameras = []
-        video_src = self.input_fields[0].get()
+        # video_src = self.input_fields[0].get()
+        video_src = "sb"
         if video_src is not None:
             # self.cameras.append(cv2.VideoCapture(video_src))
-            self.cameras.append(cv2.VideoCapture(0))
+            self.cameras.append(cv2.VideoCapture("./assets/sample/192_168_5_101.mp4"))
 
         if (not self.is_media_running) and len(self.cameras) > 0:
+            self.is_media_running = True
             self.run_media()
 
     def run_media(self):
+        if not self.is_media_running:
+            return
         if len(self.cameras) > 0:
             for cam in self.cameras:
                 ret, frame = cam.read()
@@ -92,11 +98,10 @@ class App:
                     image = Image.fromarray(image)
 
                     # Update the canvas with the new image
-                    # self.canvas.delete('all')  # clear previous image from the canvas
-                    self.canvas_width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)
-                    self.canvas_height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
-                    self.canvas.config(width=self.canvas_width, height=self.canvas_height)
-                    self.canvas.delete("all")
+                    # self.canvas_width = cam.get(cv2.CAP_PROP_FRAME_WIDTH)
+                    # self.canvas_height = cam.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                    # self.canvas.config(width=self.canvas_width, height=self.canvas_height)
+                    # self.canvas.delete("all")
                     self.canvas.create_image(0, 0, image=ImageTk.PhotoImage(image), anchor=tk.NW)
 
         # Call the update method again after a delay

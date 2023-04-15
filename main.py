@@ -2,8 +2,11 @@ import os
 import cv2
 from typing import List
 import math
+
+import matplotlib.pyplot as plt
 import numpy as np
 
+from models.detector import Predict
 from models.media import CamData
 from lib.utils import load_cameras, vertices_detector
 
@@ -87,15 +90,15 @@ if __name__ == '__main__':
         frames = get_rendered_frames()
 
         # predict overlapping region via multiple frames (1 frame for each camera)
+        list_of_frame, list_of_vertices = Predict(frames)
 
         # draw overlapping region to each frame in each camera window
         # for frame_idx in range(len(frames)):
-        #     vertices = vertices_detector(frames[frame_idx])
-        #     for i in range(len(vertices) - 1):
-        #         cv2.line(frames[frame_idx], vertices[i], vertices[i + 1], (0, 0, 255), thickness=2)
+        #     for i in range(len(list_of_vertices) - 1):
+        #         cv2.line(frames[frame_idx], list_of_vertices[i], list_of_vertices[i + 1], (0, 0, 255), thickness=2)
 
         # get merged window
-        final_window = get_merged_window(frames, NB_COLS, NB_ROWS)
+        final_window = get_merged_window(list_of_frame, NB_COLS, NB_ROWS)
 
         # Display merged frame in output window
         cv2.imshow(WINDOW_NAME, final_window)

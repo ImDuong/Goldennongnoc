@@ -8,11 +8,13 @@ from typing import List
 from models.media import CamData
 
 
-def vertices_detector(mask, show_vertices=False, show_all=False):
+def vertices_detector(image, show_vertices=False, show_all=False):
+    filtered_image = cv2.medianBlur(image, ksize=51)
+    mask = filtered_image[:, :, 0]
     # For visualize vertices
     white = np.zeros((mask.shape))
     white.fill(255)
-
+    remove_points = [(0, 0), (0, mask.shape[0] - 1), (mask.shape[1] - 1, 0), (mask.shape[1] - 1, mask.shape[0] - 1)]
     # Set a threshold value
     threshold = 0.5
     font = cv2.FONT_HERSHEY_COMPLEX
@@ -22,44 +24,45 @@ def vertices_detector(mask, show_vertices=False, show_all=False):
 
     contours, _ = cv2.findContours(gray, cv2.RETR_TREE,
                                    cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        # Going through every contours found in the image.
+        vertices = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
 
-    # Going through every contours found in the image.
-    vertices = cv2.approxPolyDP(contours[1], 0.009 * cv2.arcLength(contours[1], True), True)
+        # draws boundary of contours.
+        cv2.drawContours(gray, [vertices], 0, (255, 0, 255), 5)
 
-    # draws boundary of contours.
-    cv2.drawContours(gray, [vertices], 0, (255, 0, 255), 5)
+        # Used to flatted the array containing
+        # the co-ordinates of the vertices.
+        n = vertices.ravel()
+        i = 0
+        res = []
 
-    # Used to flatted the array containing
-    # the co-ordinates of the vertices.
-    n = vertices.ravel()
-    i = 0
-    res = []
+        for j in n:
+            if (i % 2 == 0):
+                x = n[i]
+                y = n[i + 1]
+                if (x, y) not in remove_points:
+                    res.append((x, y))
+                    string = str(x) + " " + str(y)
 
-    for j in n:
-        if (i % 2 == 0):
-            x = n[i]
-            y = n[i + 1]
-            res.append((x, y))
-            string = str(x) + " " + str(y)
-
-            if (i == 0):
-                # text on topmost co-ordinate.
-                cv2.putText(gray, "Arrow tip", (x, y),
-                            font, 0.5, (255, 0, 0))
-            else:
-                # text on remaining co-ordinates.
-                cv2.putText(gray, string, (x, y),
-                            font, 0.5, (0, 255, 0))
-        i = i + 1
+                    if (i == 0):
+                        # text on topmost co-ordinate.
+                        cv2.putText(gray, "Arrow tip", (x, y),
+                                    font, 0.5, (255, 0, 0))
+                    else:
+                        # text on remaining co-ordinates.
+                        cv2.putText(gray, string, (x, y),
+                                    font, 0.5, (0, 255, 0))
+            i = i + 1
     res = res[::-1]
     if show_all:
         plt.imshow(gray, cmap='gray')
     if show_vertices:
         for (x, y) in res:
             cv2.namedWindow("Check Points", cv2.WINDOW_NORMAL)
-            cv2.circle(white, (x, y), 3, (0, 0, 255), 10)
-            cv2.imshow("Check Points", white)
-            cv2.waitKey(0)
+            cv2.circle(white, (x, y), 10, (0, 0, 255), 10)
+            # cv2.imshow("Check Points", white)
+            # cv2.waitKey(0)
             cv2.destroyWindow("Check Points")
     return res
 
@@ -81,7 +84,7 @@ def load_cameras(cam_srcs: List, base_path: str) -> List[CamData]:
 
 # for testing
 if __name__ == '__main__':
-    img = plt.imread('./assets/sample_greyscale_overlapping_area/area1.png')[:, :, 0]
+    img = plt.imread('../assets/sample_greyscale_overlapping_area/area1.png')[:, :, 0]
 
     vertices = vertices_detector(img)
     print(vertices)
