@@ -1,5 +1,6 @@
 import os
 from typing import List
+import cv2
 
 
 class FrameData:
@@ -28,8 +29,10 @@ class SceneData:
 
 
 class CamData:
-    def __init__(self, cam_name: str):
+    def __init__(self, cam_name: str, cam_src: str, cam_cap: cv2.VideoCapture):
         self.cam_name = cam_name
+        self.cam_src = cam_src
+        self.cam_cap = cam_cap
         self.scenes: List[SceneData] = []
 
     def add_scene_data(self, scene_data: SceneData):
