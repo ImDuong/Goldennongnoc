@@ -24,6 +24,7 @@ def vertices_detector(image, show_vertices=False, show_all=False):
 
     contours, _ = cv2.findContours(gray, cv2.RETR_TREE,
                                    cv2.CHAIN_APPROX_SIMPLE)
+    res = []
     for cnt in contours:
         # Going through every contours found in the image.
         vertices = cv2.approxPolyDP(cnt, 0.01 * cv2.arcLength(cnt, True), True)
@@ -35,8 +36,6 @@ def vertices_detector(image, show_vertices=False, show_all=False):
         # the co-ordinates of the vertices.
         n = vertices.ravel()
         i = 0
-        res = []
-
         for j in n:
             if (i % 2 == 0):
                 x = n[i]
@@ -82,16 +81,16 @@ def load_cameras(cam_srcs: List, base_path: str) -> List[CamData]:
     return cameras_data
 
 
-# for testing
-if __name__ == '__main__':
-    img = plt.imread('../assets/sample_greyscale_overlapping_area/area1.png')[:, :, 0]
+# # for testing
+# if __name__ == '__main__':
+#     img = cv2.imread('../assets/sample_greyscale_overlapping_area/area1.png')
 
-    vertices = vertices_detector(img)
-    print(vertices)
-    print(len(vertices))
+#     vertices = vertices_detector(img)
+#     print(vertices)
+#     print(len(vertices))
 
-    img = plt.imread('./assets/sample_greyscale_overlapping_area/area2.png')[:, :, 0]
+#     img = cv2.imread('./assets/sample_greyscale_overlapping_area/area2.png')
 
-    vertices = vertices_detector(img)
-    print(vertices)
-    print(len(vertices))
+#     vertices = vertices_detector(img)
+#     print(vertices)
+#     print(len(vertices))

@@ -2,6 +2,7 @@ import os
 import cv2
 from typing import List
 import math
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -80,25 +81,30 @@ if __name__ == '__main__':
     NB_ROWS = math.ceil(len(cameras_data) / NB_COLS)
     width = int(cameras_data[0].cam_cap.get(cv2.CAP_PROP_FRAME_WIDTH)) * NB_COLS
     height = int(cameras_data[0].cam_cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) * NB_ROWS
-
+    for i in range(10):
+        frames = get_rendered_frames()
+    list_of_frame, list_of_vertices = Predict(frames)
+    # list_of_vertices = [[(1366, 120), (1919, 346), (1456, 1079), (1116, 533), (1652, 369), (1248, 190), (898, 163), (836, 61)], [(201, 127), (599, 158), (402, 336), (1918, 757), (0, 212), (745, 329), (764, 330), (788, 345), (799, 358), (796, 375), (787, 382), (773, 384), (739, 364), (735, 358), (735, 350), (740, 333)], [(1914, 53), (393, 231), (560, 143), (1316, 0)], [(653, 0), (869, 83), (1037, 260), (0, 96), (1919, 237), (1577, 149), (1478, 0), (509, 316), (533, 315), (572, 324), (577, 329), (577, 346), (547, 356), (500, 356), (482, 352), (469, 343), (468, 331), (0, 805), (1285, 529), (1823, 1078)]]
+    # print(list_of_vertices)
     # Create output window
     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(WINDOW_NAME, width, height)
-
+    i = 0
     while True:
+        i += 1
         # read frames
         frames = get_rendered_frames()
-
         # predict overlapping region via multiple frames (1 frame for each camera)
-        list_of_frame, list_of_vertices = Predict(frames)
-
+        #list_of_frame, list_of_vertices = Predict(frames)
+        #print(list_of_vertices)
         # draw overlapping region to each frame in each camera window
-        # for frame_idx in range(len(frames)):
-        #     for i in range(len(list_of_vertices) - 1):
-        #         cv2.line(frames[frame_idx], list_of_vertices[i], list_of_vertices[i + 1], (0, 0, 255), thickness=2)
+        for frame_idx in range(len(frames)):
+            # for i in range(len(list_of_vertices[frame_idx]) - 1):
+            #     cv2.fillPoly(frames[frame_idx], list_of_vertices[frame_idx][i], list_of_vertices[frame_idx][i + 1], (0, 0, 255), thickness=2)
+            cv2.fillPoly(frames[frame_idx], pts=[np.array(list_of_vertices[frame_idx],np.int32)], color=(255, 0, 0))
 
         # get merged window
-        final_window = get_merged_window(list_of_frame, NB_COLS, NB_ROWS)
+        final_window = get_merged_window(frames, NB_COLS, NB_ROWS)
 
         # Display merged frame in output window
         cv2.imshow(WINDOW_NAME, final_window)

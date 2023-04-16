@@ -5,6 +5,7 @@ import sys
 
 from lib.utils import vertices_detector
 
+Have_Calculated_Points = False
 img = 0
 src_pts = []
 i = 0
@@ -36,14 +37,15 @@ def Predict(list_of_image=[]):
     border_size_width = int(1 * width)
     border_size_height = int(1 * height)
     border_color = (255, 255, 255)
-    for image in list_of_image:
-        img = image
-        # Display the image and set the callback function
-        cv2.imshow('image', img)
-        cv2.setMouseCallback('image', click_event)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-    point_list.append(src_pts)
+    if point_list == []:
+        for image in list_of_image:
+            img = image
+            # Display the image and set the callback function
+            cv2.imshow('image', img)
+            cv2.setMouseCallback('image', click_event)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        point_list.append(src_pts)
     out_list = []
     inv_M_list = []
     image_list_w_border = []
